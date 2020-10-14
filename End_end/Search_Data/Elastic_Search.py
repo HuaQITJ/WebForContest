@@ -4,14 +4,21 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 
 
-class Elastic_Create:
+class Elastic_Manger:
+    '''
+    用来管理所有与elastic_search有关的内容
+    '''
+
     def __init__(self, index_name, index_type, ip='127.0.0.1'):
         self.index_name = index_name
         self.index_type = index_type
         self.es = Elasticsearch([{'host': ip, 'post': 9200}])
 
     def create_Index(self):
-        # 用来存储所有的商品数据
+        '''
+        建立索引
+        :return:
+        '''
         _index_mapping = {
             'mappings': {
                 'properties': {
@@ -39,7 +46,8 @@ class Elastic_Create:
             res = self.es.indices.create(index=self.index_name, body=_index_mapping)
             print(res)
 
-    def Insert_Data_To_Index(self):
+    def insert_data_to_index(self):
+
         # pass
         test_data = [
             {
@@ -56,7 +64,11 @@ class Elastic_Create:
             res = self.es.index(index=self.index_name, body=item)
             print(res)
 
-    def Search(self):
+    def search(self):
+        '''
+        使用搜索引擎的搜索功能
+        :return:
+        '''
         request = {'query': {
             'term': {'name': '洗衣'}
         }
@@ -67,24 +79,21 @@ class Elastic_Create:
         # print(res['_source'])
 
 
-
-
 if __name__ == '__main__':
-    # test = Elastic_Create('huaqi_goods', 'test_CB1')
-    # # test.create_Index()
-    # # test.Insert_Data_To_Index()
-    # test.Search()
+    test = Elastic_Manger('huaqi_goods', 'test_CB1')
+    # test.create_Index()
+    # test.Insert_Data_To_Index()
+    test.search()
 
-
-    t = {'took': 2, 'timed_out': False, '_shards': {'total': 1, 'successful': 1, 'skipped': 0, 'failed': 0},
-         'hits':
-             {'total': {'value': 3, 'relation': 'eq'}, 'max_score': 0.14874382, 'hits': [
-             {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'BX-AInUBbuQctGVb8biC', '_score': 0.14874382,
-              '_source': {'upid': 102, 'name': '洗衣奶', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}},
-             {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'A3-AInUBbuQctGVbTbg5', '_score': 0.12703526,
-              '_source': {'upid': 101, 'name': '洗衣机', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}},
-             {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'BH-AInUBbuQctGVbkbj-', '_score': 0.12703526,
-              '_source': {'upid': 101, 'name': '洗衣机', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}}]}}
-    for item in t['hits']['hits']:
-        print(item)
-    # print(t['hits']['hits'])
+    # t = {'took': 2, 'timed_out': False, '_shards': {'total': 1, 'successful': 1, 'skipped': 0, 'failed': 0},
+    #      'hits':
+    #          {'total': {'value': 3, 'relation': 'eq'}, 'max_score': 0.14874382, 'hits': [
+    #              {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'BX-AInUBbuQctGVb8biC', '_score': 0.14874382,
+    #               '_source': {'upid': 102, 'name': '洗衣奶', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}},
+    #              {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'A3-AInUBbuQctGVbTbg5', '_score': 0.12703526,
+    #               '_source': {'upid': 101, 'name': '洗衣机', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}},
+    #              {'_index': 'huaqi_goods', '_type': '_doc', '_id': 'BH-AInUBbuQctGVbkbj-', '_score': 0.12703526,
+    #               '_source': {'upid': 101, 'name': '洗衣机', 'date': '2020-10-1', 'price': 100, 'visitors': 1001}}]}}
+    # for item in t['hits']['hits']:
+    #     print(item)
+    # # print(t['hits']['hits'])
