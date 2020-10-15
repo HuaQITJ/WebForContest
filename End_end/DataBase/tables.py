@@ -1,21 +1,37 @@
 from flask_sqlalchemy import SQLAlchemy
+# from SQLAlchemy import Colunm,
+import sqlalchemy
+from sqlalchemy import create_engine, Column, String, Date, Integer, Enum, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-from app import app
+HOSTNAME = '127.0.0.1'
+PORT = 3306
+DATABASE = 'huaqi'
+USERNAME = 'root'
+PASSWORD = '010095cb'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:010095cb@127.0.0.1:3306/huaqi'
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+DB_URI = 'mysql+pymysql://{username}:{password}@{host}:{port}/{dbname}?charset=utf8'. \
+    format(
+    username=USERNAME,
+    password=PASSWORD,
+    host=HOSTNAME,
+    port=PORT,
+    dbname=DATABASE
+)
 
-app.config['SQLALCHEMY_ECHO'] = True
-db = SQLAlchemy(app)
+engine = create_engine(DB_URI, echo=True)  # 显示sql语句
+Base = declarative_base(engine)
+Session = sessionmaker(engine)
+session = Session()
 
 
-class User(db.Model):
-    __tablename_ = 'User'
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(60))
-    password = db.Column(db.String(60))
-    type = db.Column(db.Enum('企业用户', '主播用户'), server_default='主播用户', nullable=False)
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(String(60))
+    password = Column(String(60))
+    type = Column(Enum('企业用户', '主播用户'), server_default='主播用户', nullable=False)
 
     def __init__(self, id=None, name=None, password=None, type=None):
         self.id = id
@@ -47,15 +63,15 @@ class User(db.Model):
         return getattr(self, item)
 
 
-class Up_Infor(db.Model):
+class Up_Infor(Base):
     __tablename__ = 'up_infor'
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(60))
-    comments_count = db.Column(db.Integer)
-    fans = db.Column(db.Integer)
-    goods_comments = db.Column(db.Integer)  # 带的商品的数量
-    zans = db.Column(db.Integer)  # 点赞的数量
-    introduce = db.Column(db.String(100))
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(String(60))
+    comments_count = Column(Integer)
+    fans = Column(Integer)
+    goods_comments = Column(Integer)  # 带的商品的数量
+    zans = Column(Integer)  # 点赞的数量
+    introduce = Column(String(100))
 
     # def
     def __repr__(self):
@@ -70,11 +86,11 @@ class Up_Infor(db.Model):
 
 # 记录企业与up主的关系
 # 两个外键作为联合主键，两个id确定一条唯一的纪录(不对这玩意)
-class Contract(db.Model):
+class Contract(Base):
     __tablename__ = 'contract'
-    Contract_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    up_id = db.Column(db.Integer, db.ForeignKey('up_infor.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    Contract_id = Column(Integer, primary_key=True, autoincrement=True)
+    up_id = Column(Integer, ForeignKey('up_infor.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
 
     # db.PrimaryKeyConstraint(up_id, user_id)
 

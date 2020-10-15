@@ -4,7 +4,7 @@
 from flask import Flask, request, session, redirect
 from flask import jsonify
 from flask_login import (LoginManager, login_required)
-
+from DataBase.mysqlmanage import mySqlManager
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -29,9 +29,6 @@ login_manager.login_message = 'Unauthorized User'
 login_manager.login_message_category = "info"
 
 
-# return jsonify({1: 'Hello World!', 2: '张辉'})
-
-
 @app.route('/')
 def fuck():
     print('dasfsad')
@@ -41,18 +38,34 @@ def fuck():
 CORS(app, resources=r'/*')
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     '''
     用于解决登陆问题的函数
+    从request请求中取出一个json数据用于验证用户的消息
     :return:
     '''
-    data = request.get_json(silent=True)
-    print(data)
-    return 'dasf'
-    # 中间在数据库中search一下
+    if request.method == 'POST':
+        login_data = request.get_json(silent=True)  # 
+        print(login_data['username'])
+        print(login_data['password'])
+        # mySqlManager.search_user()
+        print(login_data)
 
-    # return jsonify({'Name': 'sfd', 'fdasf': 'dafasd'})
+    return 'dasf'
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    '''
+    用于解决注册问题
+    :return:
+    '''
+    if request.method == 'POST':
+        user_infor = request.get_data()
+        print(user_infor)
+
+    return 'vhv'
 
 
 if __name__ == '__main__':
